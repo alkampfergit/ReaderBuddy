@@ -18,7 +18,7 @@ services:
       - .:/src
       - ~/.aspnet/https:/https:ro
     working_dir: /src
-    command: dotnet watch run --project src/ReaderBuddy.WebApi/ReaderBuddy.WebApi.csproj --urls "https://+:7274;http://+:5201"
+    command: dotnet watch run --project src/server/ReaderBuddy.WebApi.csproj --urls "https://+:7274;http://+:5201"
     depends_on:
       - sqlserver
     networks:

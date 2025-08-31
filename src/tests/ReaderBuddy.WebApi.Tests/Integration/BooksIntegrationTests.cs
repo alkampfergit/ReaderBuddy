@@ -18,6 +18,7 @@ public class BooksIntegrationTests : IClassFixture<WebApplicationFactory<Program
     {
         _factory = factory.WithWebHostBuilder(builder =>
         {
+            builder.UseEnvironment("Testing");
             builder.ConfigureServices(services =>
             {
                 // Remove the app DbContext registration
@@ -26,6 +27,14 @@ public class BooksIntegrationTests : IClassFixture<WebApplicationFactory<Program
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
+                }
+
+                // Also remove the generic DbContext registration
+                var dbContextDescriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(ReaderBuddyDbContext));
+                if (dbContextDescriptor != null)
+                {
+                    services.Remove(dbContextDescriptor);
                 }
 
                 // Add a database context using an in-memory database for testing

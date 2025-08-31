@@ -5,11 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6412C8D8-7DA8-4495-9643-693B5DCEA3CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderBuddy.WebApi", "src\ReaderBuddy.WebApi\ReaderBuddy.WebApi.csproj", "{A9CE1B9D-BA7C-4054-B89A-C54134B0401B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderBuddy.WebApi", "src\server\ReaderBuddy.WebApi.csproj", "{A9CE1B9D-BA7C-4054-B89A-C54134B0401B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{181DC84F-D6EE-43EE-A172-F044D926E65B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderBuddy.WebApi.Tests", "tests\ReaderBuddy.WebApi.Tests\ReaderBuddy.WebApi.Tests.csproj", "{AD226BCD-9A84-4B38-A901-405633AC52C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderBuddy.WebApi.Tests", "src\tests\ReaderBuddy.WebApi.Tests\ReaderBuddy.WebApi.Tests.csproj", "{AD226BCD-9A84-4B38-A901-405633AC52C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +29,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A9CE1B9D-BA7C-4054-B89A-C54134B0401B} = {6412C8D8-7DA8-4495-9643-693B5DCEA3CA}
-		{AD226BCD-9A84-4B38-A901-405633AC52C4} = {181DC84F-D6EE-43EE-A172-F044D926E65B}
+		{AD226BCD-9A84-4B38-A901-405633AC52C4} = {6412C8D8-7DA8-4495-9643-693B5DCEA3CA}
 	EndGlobalSection
 EndGlobal

@@ -25,8 +25,9 @@ function App() {
       const data = await bookmarkService.getAllBookmarks();
       setBookmarks(data);
       setFilteredBookmarks(data);
-    } catch (err) {
-      setError('Failed to load bookmarks. Please check if the API server is running.');
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Unknown error occurred';
+      setError(`Failed to load bookmarks: ${errorMessage}`);
       console.error('Error loading bookmarks:', err);
     } finally {
       setIsLoading(false);
@@ -42,8 +43,9 @@ function App() {
       try {
         await bookmarkService.deleteBookmark(id);
         await loadBookmarks(); // Refresh the list after deletion
-      } catch (err) {
-        setError('Failed to delete bookmark. Please try again.');
+      } catch (err: any) {
+        const errorMessage = err?.message || 'Unknown error occurred';
+        setError(`Failed to delete bookmark: ${errorMessage}`);
         console.error('Error deleting bookmark:', err);
       }
     }
@@ -55,8 +57,9 @@ function App() {
       setError(null);
       const results = await bookmarkService.searchBookmarks(searchTerm);
       setFilteredBookmarks(results);
-    } catch (err) {
-      setError('Failed to search bookmarks. Please try again.');
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Unknown error occurred';
+      setError(`Failed to search bookmarks: ${errorMessage}`);
       console.error('Error searching bookmarks:', err);
     } finally {
       setIsSearching(false);

@@ -3,12 +3,12 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY ["src/ReaderBuddy.WebApi/ReaderBuddy.WebApi.csproj", "src/ReaderBuddy.WebApi/"]
-RUN dotnet restore "src/ReaderBuddy.WebApi/ReaderBuddy.WebApi.csproj"
+COPY ["src/server/ReaderBuddy.WebApi.csproj", "src/server/"]
+RUN dotnet restore "src/server/ReaderBuddy.WebApi.csproj"
 
 # Copy everything else and build
 COPY . .
-WORKDIR "/src/src/ReaderBuddy.WebApi"
+WORKDIR "/src/src/server"
 RUN dotnet build "ReaderBuddy.WebApi.csproj" -c Release -o /app/build
 
 # Publish stage

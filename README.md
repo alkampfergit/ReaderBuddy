@@ -7,27 +7,28 @@ A comprehensive reading tracking API with React UI built with ASP.NET Core and E
 ```
 ReaderBuddy/
 ├── src/
-│   └── ReaderBuddy.WebApi/           # Main Web API project
-│       ├── Controllers/              # API controllers
-│       ├── Models/                   # Domain models
-│       │   └── DTOs/                 # Data Transfer Objects
-│       ├── Services/                 # Business logic layer
-│       ├── Data/                     # Data access layer
-│       ├── Configuration/            # Configuration classes
-│       └── Program.cs                # Application entry point
-├── client/                           # React frontend application
-│   ├── src/
-│   │   ├── components/               # React components
-│   │   ├── services/                 # API client services
-│   │   ├── types/                    # TypeScript type definitions
-│   │   └── App.tsx                   # Main App component
-│   ├── public/                       # Static assets
-│   └── package.json                  # NPM dependencies
-├── tests/
-│   └── ReaderBuddy.WebApi.Tests/     # Test project
-│       ├── Controllers/              # Controller tests
-│       ├── Services/                 # Service tests
-│       └── Integration/              # Integration tests
+│   ├── server/                       # ASP.NET Core Web API project
+│   │   ├── Controllers/              # API controllers
+│   │   ├── Models/                   # Domain models
+│   │   │   └── DTOs/                 # Data Transfer Objects
+│   │   ├── Services/                 # Business logic layer
+│   │   ├── Data/                     # Data access layer
+│   │   ├── Configuration/            # Configuration classes
+│   │   ├── Migrations/               # Entity Framework migrations
+│   │   └── Program.cs                # Application entry point
+│   ├── client/                       # React frontend application
+│   │   ├── src/
+│   │   │   ├── components/           # React components
+│   │   │   ├── services/             # API client services
+│   │   │   ├── types/                # TypeScript type definitions
+│   │   │   └── App.tsx               # Main App component
+│   │   ├── public/                   # Static assets
+│   │   └── package.json              # NPM dependencies
+│   └── tests/
+│       └── ReaderBuddy.WebApi.Tests/ # Test project
+│           ├── Controllers/          # Controller tests
+│           ├── Services/             # Service tests
+│           └── Integration/          # Integration tests
 ├── Dockerfile                        # Docker configuration
 ├── docker-compose.yml               # Production Docker Compose
 ├── docker-compose.dev.yml           # Development Docker Compose
@@ -40,7 +41,7 @@ ReaderBuddy/
 - **React Frontend UI**: Modern, responsive web interface for bookmark management
 - **Bookmark Management**: Save, organize, and search bookmarks with tags
 - **Layered Architecture**: Clear separation between controllers, services, and data access
-- **Entity Framework Core**: Code-first approach with migrations support
+- **Entity Framework Core**: Code-first approach with automatic database initialization
 - **Repository Pattern**: Abstracted data access with generic repository implementation
 - **Dependency Injection**: Built-in ASP.NET Core DI container
 - **Configuration Management**: Environment-specific settings with strongly-typed configuration
@@ -55,7 +56,7 @@ ReaderBuddy/
 - **.NET 9**: Latest LTS framework
 - **ASP.NET Core**: Web API framework
 - **Entity Framework Core**: Object-relational mapping
-- **SQL Server**: Database (configurable)
+- **SQLite/SQL Server**: SQLite for development, SQL Server for production
 - **xUnit**: Testing framework
 - **Moq**: Mocking framework
 - **Swagger/OpenAPI**: API documentation
@@ -66,8 +67,10 @@ ReaderBuddy/
 ### Prerequisites
 
 - .NET 9 SDK
-- SQL Server (LocalDB for development)
+- Node.js 18+ (for React client)
 - Docker (optional)
+
+*Note: No database setup required - SQLite is automatically initialized*
 
 ### Running Locally
 
@@ -82,24 +85,21 @@ ReaderBuddy/
    dotnet restore
    ```
 
-3. **Update database connection string** (if needed)
-   - Edit `src/ReaderBuddy.WebApi/appsettings.Development.json`
-   - Modify the `ConnectionStrings:DefaultConnection` value
-
-4. **Run the application**
+3. **Run the API** (automatically initializes database)
    ```bash
-   dotnet run --project src/ReaderBuddy.WebApi
+   dotnet run --project src/server
    ```
 
-5. **Access the API**
-   - Swagger UI: https://localhost:7274 or http://localhost:5201
-   - Health Check: https://localhost:7274/health
+4. **Access the API**
+   - Swagger UI: http://localhost:5201/swagger
+   - Health Check: http://localhost:5201/health
+   - Database: SQLite file automatically created at `src/server/ReaderBuddy_Dev.db`
 
 ### Running the React UI
 
 1. **Navigate to the client directory**
    ```bash
-   cd client
+   cd src/client
    ```
 
 2. **Install dependencies**
@@ -107,9 +107,11 @@ ReaderBuddy/
    npm install
    ```
 
-3. **Configure API endpoint** (optional)
-   - The default configuration points to `http://localhost:5000/api` for development
-   - You can modify the `.env.development` file to change the API URL
+3. **Configure API endpoint** (for local development)
+   ```bash
+   # Set environment variable for local development
+   export REACT_APP_API_URL=http://localhost:5201/api
+   ```
 
 4. **Start the development server**
    ```bash
@@ -142,6 +144,9 @@ ReaderBuddy/
 ```bash
 # Run all tests
 dotnet test
+
+# Run specific test project
+dotnet test src/tests/ReaderBuddy.WebApi.Tests/
 
 # Run tests with coverage
 dotnet test --collect:"XPlat Code Coverage"
@@ -181,7 +186,7 @@ The application uses the following configuration structure:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=ReaderBuddyDb;Trusted_Connection=true;MultipleActiveResultSets=true"
+    "DefaultConnection": "Data Source=ReaderBuddy.db"
   },
   "ApplicationSettings": {
     "Name": "ReaderBuddy",
@@ -210,13 +215,12 @@ The application uses the following configuration structure:
 
 ```bash
 # Add new migration
-dotnet ef migrations add InitialCreate --project src/ReaderBuddy.WebApi
-
-# Update database
-dotnet ef database update --project src/ReaderBuddy.WebApi
+dotnet ef migrations add MigrationName --project src/server
 
 # Remove last migration
-dotnet ef migrations remove --project src/ReaderBuddy.WebApi
+dotnet ef migrations remove --project src/server
+
+# Note: Database updates happen automatically on application startup
 ```
 
 ### Database Schema
@@ -224,16 +228,28 @@ dotnet ef migrations remove --project src/ReaderBuddy.WebApi
 The application includes the following entities:
 
 - **Book**: Represents a book with title, author, ISBN, genre, etc.
+- **Bookmark**: User bookmarks with URLs, descriptions, and tags
 - **Reading**: Represents a user's reading session for a book
+- **Tag**: Categories for organizing bookmarks
+- **BookmarkTag**: Many-to-many relationship between bookmarks and tags
+
+### Database Auto-Initialization
+
+The application automatically:
+- Creates the SQLite database file on first run
+- Applies all pending migrations
+- Uses SQLite for development (cross-platform)
+- Supports SQL Server for production environments
 
 ## Development
 
 ### Adding New Features
 
-1. **Models**: Add domain entities in `Models/`
-2. **Services**: Add business logic in `Services/`
-3. **Controllers**: Add API endpoints in `Controllers/`
-4. **Tests**: Add corresponding tests in the test project
+1. **Models**: Add domain entities in `src/server/Models/`
+2. **Services**: Add business logic in `src/server/Services/`
+3. **Controllers**: Add API endpoints in `src/server/Controllers/`
+4. **React Components**: Add UI components in `src/client/src/components/`
+5. **Tests**: Add corresponding tests in `src/tests/`
 
 ### Code Quality
 

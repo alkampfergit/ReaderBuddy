@@ -43,8 +43,8 @@ ReaderBuddy is a .NET application designed for reading assistance and management
 - If unit tests exist, always run `dotnet test` after making changes
 - Before committing, verify the solution builds successfully
 - **VALIDATION SCENARIOS**: When this codebase has actual functionality, always test:
-  - Web API: Run `dotnet run --project src/ReaderBuddy.WebApi` and verify API responds at https://localhost:7274
-  - React client: Run `npm start` in client directory and verify UI loads at http://localhost:3000  
+  - Web API: Run `dotnet run --project src/server` and verify API responds at http://localhost:5201
+  - React client: Run `npm start` in src/client directory and verify UI loads at http://localhost:3000  
   - Docker: Build with `docker build -t readerbuddy .` and run with `docker run -p 8080:8080 readerbuddy`
   - Integration: Verify React client can communicate with API backend
   - Always run `dotnet format` before committing to ensure code formatting consistency
@@ -66,12 +66,10 @@ drwxr-xr-x 2 runner docker 4096 Aug 31 10:36 .github
 -rw-r--r-- 1 runner docker 1067 Aug 31 10:36 LICENSE
 -rw-r--r-- 1 runner docker 7853 Aug 31 10:36 README.md
 -rw-r--r-- 1 runner docker 2041 Aug 31 10:36 ReaderBuddy.sln
-drwxr-xr-x 4 runner docker 4096 Aug 31 10:36 client
 -rw-r--r-- 1 runner docker 1202 Aug 31 10:36 docker-compose.dev.yml
 -rw-r--r-- 1 runner docker 1144 Aug 31 10:36 docker-compose.yml
 -rw-r--r-- 1 runner docker 1466 Aug 31 10:36 GitVersion.yml
-drwxr-xr-x 3 runner docker 4096 Aug 31 10:36 src
-drwxr-xr-x 3 runner docker 4096 Aug 31 10:36 tests
+drwxr-xr-x 4 runner docker 4096 Aug 31 10:36 src
 ```
 
 ### Environment verification
@@ -135,11 +133,10 @@ Current repository structure:
 ```
 ReaderBuddy/
 ├── src/
-│   └── ReaderBuddy.WebApi/          # ASP.NET Core Web API
-├── tests/
-│   └── ReaderBuddy.WebApi.Tests/    # xUnit test project
-├── client/                          # React TypeScript UI
-├── docs/                           # Documentation (if needed)
+│   ├── server/                     # ASP.NET Core Web API
+│   ├── client/                     # React TypeScript UI
+│   └── tests/
+│       └── ReaderBuddy.WebApi.Tests/ # xUnit test project
 ├── .github/
 │   ├── workflows/                  # CI/CD GitHub Actions
 │   └── copilot-instructions.md     # This file
@@ -148,6 +145,7 @@ ReaderBuddy/
 ├── docker-compose.dev.yml         # Development Docker Compose
 ├── GitVersion.yml                 # Semantic versioning configuration
 ├── ReaderBuddy.sln               # .NET solution file
+├── CLAUDE.md                      # Claude Code instructions
 ├── .gitignore
 ├── LICENSE
 └── README.md

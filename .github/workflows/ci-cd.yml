@@ -95,7 +95,7 @@ jobs:
           path: ./coverage
 
       - name: Publish Web API
-        run: dotnet publish src/ReaderBuddy.WebApi/ReaderBuddy.WebApi.csproj --configuration Release --no-build --output ./publish/webapi -p:Version=${{ needs.gitversion.outputs.version }}
+        run: dotnet publish src/server/ReaderBuddy.WebApi.csproj --configuration Release --no-build --output ./publish/webapi -p:Version=${{ needs.gitversion.outputs.version }}
 
       - name: Upload Web API artifacts
         uses: actions/upload-artifact@v4
@@ -116,21 +116,21 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: src/client/package-lock.json
 
       - name: Install client dependencies
-        working-directory: client
+        working-directory: src/client
         run: npm ci
 
       - name: Build client
-        working-directory: client
+        working-directory: src/client
         run: npm run build
 
       - name: Upload client artifacts
         uses: actions/upload-artifact@v4
         with:
           name: client-${{ needs.gitversion.outputs.version }}
-          path: client/build
+          path: src/client/build
 
   docker-build:
     name: Build Docker Image

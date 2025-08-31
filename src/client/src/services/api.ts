@@ -1,7 +1,19 @@
 import axios from 'axios';
 import { BookmarkDto, CreateBookmarkDto, TagDto } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://localhost:7000/api';
+// Dynamic API URL detection
+const getApiBaseUrl = (): string => {
+  // If REACT_APP_API_URL is explicitly set and we're in development mode, use it
+  if (process.env.REACT_APP_API_URL && process.env.NODE_ENV === 'development') {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // For production or when served by the C# backend, use relative path
+  // This will automatically resolve to the same host/port as the current page
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +21,27 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Add request interceptor to log the full URL being called
+api.interceptors.request.use(request => {
+  console.log('API Request URL:', request.baseURL + request.url);
+  return request;
+});
+
+// Add response interceptor to enhance error messages
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response) {
+      // Server responded with error status
+      error.message = `API Error (${error.response.status}): ${error.message} - URL: ${error.config.baseURL}${error.config.url}`;
+    } else if (error.request) {
+      // Request was made but no response received (likely connection error)
+      error.message = `Connection Error: Unable to reach API server at ${error.config.baseURL}${error.config.url}`;
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const bookmarkService = {
   // Get all bookmarks
