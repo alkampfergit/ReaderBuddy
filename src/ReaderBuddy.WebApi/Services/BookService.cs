@@ -54,9 +54,9 @@ public class BookService : IBookService
     public async Task<IEnumerable<Book>> SearchBooksAsync(string searchTerm)
     {
         _logger.LogInformation("Searching books with term: {SearchTerm}", searchTerm);
-        return await _bookRepository.FindAsync(b => 
-            b.Title.Contains(searchTerm) || 
-            b.Author.Contains(searchTerm) || 
+        return await _bookRepository.FindAsync(b =>
+            b.Title.Contains(searchTerm) ||
+            b.Author.Contains(searchTerm) ||
             b.Genre.Contains(searchTerm));
     }
 }

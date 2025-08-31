@@ -70,8 +70,8 @@ public class BookServiceTests
 
         // Assert
         Assert.NotNull(result);
-        _mockRepository.Verify(r => r.AddAsync(It.Is<Book>(b => 
-            b.Title == newBook.Title && 
+        _mockRepository.Verify(r => r.AddAsync(It.Is<Book>(b =>
+            b.Title == newBook.Title &&
             b.Author == newBook.Author &&
             b.CreatedAt != default &&
             b.UpdatedAt != default)), Times.Once);

@@ -1,0 +1,57 @@
+mode: ContinuousDelivery
+branches:
+  master:
+    tag: ''
+    increment: Minor
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: ['develop', 'release']
+  develop:
+    tag: 'alpha'
+    increment: Minor
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: true
+    source-branches: []
+  release:
+    tag: 'beta'
+    increment: None
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: ['develop']
+  hotfix:
+    tag: 'hotfix'
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    source-branches: ['master']
+  feature:
+    tag: 'feat'
+    increment: None
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    source-branches: ['develop']
+  pull-request:
+    tag: 'pr'
+    increment: Inherit
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+
+ignore:
+  sha: []
+
+merge-message-formats: {}
+
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+no-bump-message: '\+semver:\s?(none|skip)'
+
+legacy-semver-padding: 4
+build-metadata-padding: 4
+commits-since-version-source-padding: 4
+
+tag-prefix: 'v'
+tag-pre-release-weight: 60000
+commit-message-incrementing: Enabled
+
+continuous-delivery-fallback-tag: 'ci'

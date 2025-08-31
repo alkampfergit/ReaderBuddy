@@ -47,6 +47,8 @@ ReaderBuddy/
 - **Swagger/OpenAPI**: Interactive API documentation
 - **Docker Support**: Containerization for development and production
 - **Comprehensive Testing**: Unit tests, integration tests, and mocking examples
+- **CI/CD Pipeline**: GitHub Actions with semantic versioning and automated Docker builds
+- **Git Flow Support**: Structured branching model with automatic version management
 
 ## Technology Stack
 
@@ -240,6 +242,94 @@ The application includes the following entities:
 - Write comprehensive tests
 - Follow REST API conventions
 - Use proper error handling and logging
+
+## Git Flow and CI/CD
+
+### Branching Strategy
+
+This repository follows the Git Flow branching model:
+
+- **`master`**: Production-ready code, protected branch
+- **`develop`**: Integration branch for features
+- **`feature/*`**: Feature branches (e.g., `feature/user-authentication`)
+- **`release/*`**: Release preparation branches (e.g., `release/1.2.0`)
+- **`hotfix/*`**: Critical production fixes (e.g., `hotfix/security-patch`)
+
+### Semantic Versioning
+
+The project uses [GitVersion](https://gitversion.net/) for automatic semantic versioning:
+
+- **Major** (`+semver: major`): Breaking changes
+- **Minor** (`+semver: minor`): New features, backwards compatible
+- **Patch** (`+semver: patch`): Bug fixes, backwards compatible
+- **None** (`+semver: none`): No version increment (documentation, etc.)
+
+Version format: `Major.Minor.Patch[-PreRelease+BuildMetadata]`
+
+### CI/CD Pipeline
+
+The GitHub Actions pipeline (`.github/workflows/ci-cd.yml`) automatically:
+
+1. **Calculates semantic version** using GitVersion
+2. **Builds and tests** the .NET solution
+3. **Builds React client** with Node.js
+4. **Creates Docker images** for master and hotfix branches
+5. **Creates Git tags** on master branch releases
+6. **Uploads artifacts** for deployment
+
+#### Workflow Triggers
+
+- **Automatic**: Push to any branch, PRs to master/develop
+- **Manual**: Workflow dispatch with optional Docker build override
+
+#### Branch-Specific Behaviors
+
+- **`master`**: Full pipeline + Docker build + Git tag creation
+- **`develop`**: Build, test, and client build
+- **`feature/*`**: Build and test validation
+- **`hotfix/*`**: Full pipeline + Docker build
+- **`release/*`**: Build, test, and prepare for release
+
+### Local Development Workflow
+
+1. **Clone and setup**:
+   ```bash
+   git clone <repository-url>
+   cd ReaderBuddy
+   git checkout develop
+   ```
+
+2. **Create feature branch**:
+   ```bash
+   git checkout -b feature/my-new-feature
+   ```
+
+3. **Development cycle**:
+   ```bash
+   # Make changes
+   dotnet build
+   dotnet test
+   
+   # Commit with semantic versioning
+   git commit -m "feat: add user authentication +semver: minor"
+   ```
+
+4. **Create pull request**:
+   - Target: `develop` branch
+   - CI/CD pipeline validates changes
+   - Code review and merge
+
+### Docker Image Management
+
+Docker images are automatically built for:
+- Pushes to `master` branch
+- Pushes to `hotfix/*` branches  
+- Manual workflow triggers (with override option)
+
+Images are tagged with:
+- `latest` (master branch only)
+- Semantic version (e.g., `1.2.3`)
+- Branch-specific tags for hotfixes
 
 ## Deployment
 
