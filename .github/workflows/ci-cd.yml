@@ -20,6 +20,9 @@ on:
         default: 'false'
         type: boolean
 
+permissions:
+  contents: write
+
 env:
   DOTNET_VERSION: '9.0.x'
   DOCKER_IMAGE_NAME: 'readerbuddy'
@@ -154,6 +157,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+          load: true
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ needs.gitversion.outputs.version }}
             ${{ env.DOCKER_IMAGE_NAME }}:latest
