@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  readerbuddy-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    container_name: readerbuddy-api-dev
+    ports:
+      - "5201:5201"
+      - "7274:7274"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:7274;http://+:5201
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ReaderBuddyDb_Dev;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;
+    volumes:
+      - .:/src
+      - ~/.aspnet/https:/https:ro
+    working_dir: /src
+    command: dotnet watch run --project src/ReaderBuddy.WebApi/ReaderBuddy.WebApi.csproj --urls "https://+:7274;http://+:5201"
+    depends_on:
+      - sqlserver
+    networks:
+      - readerbuddy-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: readerbuddy-sqlserver-dev
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_dev_data:/var/opt/mssql
+    networks:
+      - readerbuddy-network
+
+volumes:
+  sqlserver_dev_data:
+
+networks:
+  readerbuddy-network:
+    driver: bridge

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  readerbuddy-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: readerbuddy-api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ReaderBuddyDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      - sqlserver
+    networks:
+      - readerbuddy-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: readerbuddy-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - readerbuddy-network
+
+volumes:
+  sqlserver_data:
+
+networks:
+  readerbuddy-network:
+    driver: bridge
