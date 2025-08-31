@@ -1,13 +1,30 @@
 # ReaderBuddy
-ReaderBuddy is a .NET application designed for reading assistance and management. This repository is currently in its initial state with foundation files prepared for .NET development.
+ReaderBuddy is a .NET application designed for reading assistance and management. This repository includes a comprehensive CI/CD pipeline with Git Flow, semantic versioning, and automated Docker builds.
 
 **ALWAYS follow these instructions first. Only fallback to additional search and context gathering if the information in these instructions is incomplete or found to be in error.**
+
+## Git Flow and Branching Strategy
+- **master**: Production-ready code, receives merges from release branches and hotfixes
+- **develop**: Integration branch for features, used for ongoing development  
+- **feature/***: Feature branches created from develop, merged back to develop
+- **release/***: Release preparation branches created from develop, merged to master and develop
+- **hotfix/***: Critical fixes created from master, merged to master and develop
+- GitVersion automatically calculates semantic versions based on branch patterns
+- Tags are automatically created on master branch pushes using format `v{version}`
+
+## CI/CD Pipeline
+- **Automated builds**: Triggered on push to master, develop, release/*, hotfix/*, feature/*
+- **Pull request validation**: Builds and tests run on PRs to master/develop
+- **Semantic versioning**: Uses GitVersion with configuration in `GitVersion.yml`
+- **Docker builds**: Automatic on master/hotfix branches, manual option available
+- **Artifacts**: Publishes .NET API, React client, and Docker images
+- **Manual triggers**: Workflow can be manually triggered with option to force Docker build
 
 ## Working Effectively
 - Verify environment setup:
   - `dotnet --version` -- should show .NET 8.0.119 or later
   - `git --version` -- should show Git 2.51.0 or later
-- Current repository state: This is a minimal repository with only LICENSE and .gitignore files
+- Current repository state: Full-featured .NET 8 WebAPI with React client, CI/CD pipeline, and Docker support
 - Project initialization (when creating new projects):
   - `dotnet new list` -- view available .NET project templates
   - `dotnet new sln -n ReaderBuddy` -- create solution file
@@ -26,9 +43,10 @@ ReaderBuddy is a .NET application designed for reading assistance and management
 - If unit tests exist, always run `dotnet test` after making changes
 - Before committing, verify the solution builds successfully
 - **VALIDATION SCENARIOS**: When this codebase has actual functionality, always test:
-  - If it's a console application: Run `dotnet run` and verify expected output
-  - If it's a web application: Start the application and verify it responds to requests
-  - If it's a library: Run unit tests that exercise the public API
+  - Web API: Run `dotnet run --project src/ReaderBuddy.WebApi` and verify API responds at https://localhost:7274
+  - React client: Run `npm start` in client directory and verify UI loads at http://localhost:3000  
+  - Docker: Build with `docker build -t readerbuddy .` and run with `docker run -p 8080:8080 readerbuddy`
+  - Integration: Verify React client can communicate with API backend
   - Always run `dotnet format` before committing to ensure code formatting consistency
 - Currently no functional validation scenarios exist due to minimal codebase state
 
@@ -38,13 +56,22 @@ The following are outputs from frequently run commands in the current environmen
 ### Repository root structure
 ```
 ls -la
-total 28
-drwxr-xr-x 4 runner docker 4096 Aug 31 09:44 .
-drwxr-xr-x 3 runner docker 4096 Aug 31 09:41 ..
-drwxr-xr-x 7 runner docker 4096 Aug 31 09:44 .git
-drwxr-xr-x 2 runner docker 4096 Aug 31 09:45 .github
--rw-r--r-- 1 runner docker 7370 Aug 31 09:41 .gitignore
--rw-r--r-- 1 runner docker 1067 Aug 31 09:41 LICENSE
+total 64
+drwxr-xr-x 7 runner docker 4096 Aug 31 10:36 .
+drwxr-xr-x 3 runner docker 4096 Aug 31 10:35 ..
+drwxr-xr-x 7 runner docker 4096 Aug 31 10:36 .git
+drwxr-xr-x 2 runner docker 4096 Aug 31 10:36 .github
+-rw-r--r-- 1 runner docker 7631 Aug 31 10:36 .gitignore
+-rw-r--r-- 1 runner docker  740 Aug 31 10:36 Dockerfile
+-rw-r--r-- 1 runner docker 1067 Aug 31 10:36 LICENSE
+-rw-r--r-- 1 runner docker 7853 Aug 31 10:36 README.md
+-rw-r--r-- 1 runner docker 2041 Aug 31 10:36 ReaderBuddy.sln
+drwxr-xr-x 4 runner docker 4096 Aug 31 10:36 client
+-rw-r--r-- 1 runner docker 1202 Aug 31 10:36 docker-compose.dev.yml
+-rw-r--r-- 1 runner docker 1144 Aug 31 10:36 docker-compose.yml
+-rw-r--r-- 1 runner docker 1466 Aug 31 10:36 GitVersion.yml
+drwxr-xr-x 3 runner docker 4096 Aug 31 10:36 src
+drwxr-xr-x 3 runner docker 4096 Aug 31 10:36 tests
 ```
 
 ### Environment verification
@@ -74,11 +101,23 @@ Solution File                                 sln,solution                      
 xUnit Test Project                            xunit                       [C#],F#,VB  Test/xUnit
 ```
 
+## CI/CD Commands
+When working with the CI/CD pipeline:
+- `git push origin master` -- triggers full CI/CD pipeline with Docker build and tagging  
+- `git push origin develop` -- triggers build and test pipeline
+- `git push origin feature/branch-name` -- triggers build and test validation
+- GitHub Actions can be manually triggered from the Actions tab with optional Docker build
+- GitVersion automatically calculates versions: `dotnet tool install --global GitVersion.Tool && dotnet gitversion`
+- Local Docker build: `docker build -t readerbuddy .` 
+
 ## Development Guidelines
+- Follow Git Flow branching model (master, develop, feature/*, release/*, hotfix/*)
+- Use semantic commit messages for automatic version bumping (+semver: major/minor/patch/none)
+- CI/CD pipeline runs on all branch pushes and pull requests
+- Docker images built automatically on master and hotfix branches
+- All builds must pass before merging to master or develop
 - Use .NET 8+ language features and patterns
 - Follow standard .NET project structure conventions
-- Place source code in `src/` directory when project grows
-- Place tests in `tests/` or `test/` directory when adding tests
 - Use xUnit for unit testing (most common in .NET ecosystem)
 - Consider using ASP.NET Core for web applications given the "ReaderBuddy" name suggests a user-facing application
 - **TIMING EXPECTATIONS**:
@@ -92,28 +131,34 @@ xUnit Test Project                            xunit                       [C#],F
   - `dotnet publish` for deployment scenarios (takes 10-30 seconds for small apps)
 
 ## Project Structure Expectations
-When this repository develops, expect the following structure:
+Current repository structure:
 ```
 ReaderBuddy/
 ├── src/
-│   ├── ReaderBuddy.Core/        # Core business logic
-│   ├── ReaderBuddy.Web/         # Web application (if applicable)
-│   └── ReaderBuddy.Console/     # Console application (if applicable)
+│   └── ReaderBuddy.WebApi/          # ASP.NET Core Web API
 ├── tests/
-│   ├── ReaderBuddy.Core.Tests/
-│   └── ReaderBuddy.Web.Tests/
-├── docs/                        # Documentation
+│   └── ReaderBuddy.WebApi.Tests/    # xUnit test project
+├── client/                          # React TypeScript UI
+├── docs/                           # Documentation (if needed)
 ├── .github/
-│   └── workflows/               # CI/CD pipelines
-├── ReaderBuddy.sln             # Solution file
+│   ├── workflows/                  # CI/CD GitHub Actions
+│   └── copilot-instructions.md     # This file
+├── Dockerfile                      # Multi-stage Docker build
+├── docker-compose.yml             # Production Docker Compose
+├── docker-compose.dev.yml         # Development Docker Compose
+├── GitVersion.yml                 # Semantic versioning configuration
+├── ReaderBuddy.sln               # .NET solution file
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
 
 ## Important Notes
-- This repository is currently minimal - actual development commands will need validation as the codebase grows
+- Repository has complete CI/CD pipeline with semantic versioning and Docker support
 - All build and test timing estimates are for typical .NET projects - actual times may vary
 - Always verify commands work in your specific project context before relying on these instructions
 - The .gitignore is configured for Visual Studio/.NET development patterns
 - MIT license allows for open source development and distribution
+- GitVersion configuration supports Git Flow branching model
+- CI/CD pipeline automatically builds Docker images for deployment readiness
+- Manual workflow triggers available for testing CI/CD changes

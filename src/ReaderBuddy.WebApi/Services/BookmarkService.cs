@@ -27,34 +27,34 @@ public class BookmarkService : IBookmarkService
     public async Task<IEnumerable<BookmarkDto>> GetAllBookmarksAsync()
     {
         _logger.LogInformation("Retrieving all bookmarks");
-        
+
         var bookmarks = await _bookmarkRepository.GetAllAsync();
         var result = new List<BookmarkDto>();
-        
+
         foreach (var bookmark in bookmarks)
         {
             var bookmarkDto = await MapToBookmarkDto(bookmark);
             result.Add(bookmarkDto);
         }
-        
+
         return result;
     }
 
     public async Task<BookmarkDto?> GetBookmarkByIdAsync(int id)
     {
         _logger.LogInformation("Retrieving bookmark with ID: {BookmarkId}", id);
-        
+
         var bookmark = await _bookmarkRepository.GetByIdAsync(id);
         if (bookmark == null)
             return null;
-            
+
         return await MapToBookmarkDto(bookmark);
     }
 
     public async Task<BookmarkDto> CreateBookmarkAsync(CreateBookmarkDto createBookmarkDto)
     {
         _logger.LogInformation("Creating new bookmark: {BookmarkTitle}", createBookmarkDto.Title);
-        
+
         var bookmark = new Bookmark
         {
             Title = createBookmarkDto.Title,
@@ -65,17 +65,17 @@ public class BookmarkService : IBookmarkService
         };
 
         var createdBookmark = await _bookmarkRepository.AddAsync(bookmark);
-        
+
         // Handle tags
         await AssignTagsToBookmark(createdBookmark.Id, createBookmarkDto.Tags);
-        
+
         return await MapToBookmarkDto(createdBookmark);
     }
 
     public async Task UpdateBookmarkAsync(int id, CreateBookmarkDto updateBookmarkDto)
     {
         _logger.LogInformation("Updating bookmark with ID: {BookmarkId}", id);
-        
+
         var bookmark = await _bookmarkRepository.GetByIdAsync(id);
         if (bookmark == null)
             throw new ArgumentException($"Bookmark with ID {id} not found");
@@ -86,7 +86,7 @@ public class BookmarkService : IBookmarkService
         bookmark.UpdatedAt = DateTime.UtcNow;
 
         await _bookmarkRepository.UpdateAsync(bookmark);
-        
+
         // Update tags
         await AssignTagsToBookmark(id, updateBookmarkDto.Tags);
     }
@@ -94,7 +94,7 @@ public class BookmarkService : IBookmarkService
     public async Task DeleteBookmarkAsync(int id)
     {
         _logger.LogInformation("Deleting bookmark with ID: {BookmarkId}", id);
-        
+
         var bookmark = await _bookmarkRepository.GetByIdAsync(id);
         if (bookmark != null)
         {
@@ -105,26 +105,26 @@ public class BookmarkService : IBookmarkService
     public async Task<IEnumerable<BookmarkDto>> SearchBookmarksAsync(string searchTerm)
     {
         _logger.LogInformation("Searching bookmarks with term: {SearchTerm}", searchTerm);
-        
+
         var bookmarks = await _bookmarkRepository.FindAsync(b =>
             b.Title.Contains(searchTerm) ||
             b.Description.Contains(searchTerm) ||
             b.Url.Contains(searchTerm));
-            
+
         var result = new List<BookmarkDto>();
         foreach (var bookmark in bookmarks)
         {
             var bookmarkDto = await MapToBookmarkDto(bookmark);
             result.Add(bookmarkDto);
         }
-        
+
         return result;
     }
 
     public async Task<IEnumerable<TagDto>> GetAllTagsAsync()
     {
         _logger.LogInformation("Retrieving all tags");
-        
+
         var tags = await _tagRepository.GetAllAsync();
         return tags.Select(t => new TagDto
         {
@@ -138,7 +138,7 @@ public class BookmarkService : IBookmarkService
     {
         var bookmarkTags = await _bookmarkTagRepository.FindAsync(bt => bt.BookmarkId == bookmark.Id);
         var tagIds = bookmarkTags.Select(bt => bt.TagId).ToList();
-        
+
         var tags = new List<TagDto>();
         foreach (var tagId in tagIds)
         {
@@ -182,7 +182,7 @@ public class BookmarkService : IBookmarkService
                 continue;
 
             var existingTag = (await _tagRepository.FindAsync(t => t.Name == tagName.Trim())).FirstOrDefault();
-            
+
             Tag tag;
             if (existingTag == null)
             {
