@@ -76,15 +76,19 @@ if (!app.Environment.IsEnvironment("Testing"))
     await InitializeDatabaseAsync(app);
 }
 
-// Check if the React build directory exists and log an error if not
-var uiPath = Path.Combine(builder.Environment.ContentRootPath, "..", "client", "build");
-var uiDir = new DirectoryInfo(uiPath);
+// Check if the React build directory exists and log information
+var staticFilesPath = Path.Combine(builder.Environment.ContentRootPath, "..", "client", "build");
+var uiDir = new DirectoryInfo(staticFilesPath);
 var fullUiPath = uiDir.FullName;
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("UI path: {UiPath}", fullUiPath);
-if (!Directory.Exists(uiPath))
+if (!Directory.Exists(staticFilesPath))
 {
-    logger.LogError("UI path not found: {UiPath}. Static files may not be served correctly.", fullUiPath);
+    logger.LogWarning("UI path not found: {UiPath}. Static files will not be served.", fullUiPath);
+}
+else
+{
+    logger.LogInformation("UI path found: {UiPath}. Static files will be served.", fullUiPath);
 }
 
 // Configure the HTTP request pipeline
@@ -107,27 +111,32 @@ else
 app.UseHttpsRedirection();
 app.UseCors();
 
-// Serve static files from the React build directory
-app.UseStaticFiles(new StaticFileOptions
+// Serve static files from the React build directory if it exists
+if (Directory.Exists(staticFilesPath))
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "..", "client", "build")),
-    RequestPath = ""
-});
-
-// Fallback to index.html for SPA routing
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path.Value != null && 
-        !context.Request.Path.Value.StartsWith("/api") && 
-        !context.Request.Path.Value.StartsWith("/swagger") &&
-        !context.Request.Path.Value.StartsWith("/health") &&
-        !Path.HasExtension(context.Request.Path.Value))
+    app.UseStaticFiles(new StaticFileOptions
     {
-        context.Request.Path = "/index.html";
-    }
-    await next();
-});
+        FileProvider = new PhysicalFileProvider(staticFilesPath),
+        RequestPath = ""
+    });
+}
+
+// Fallback to index.html for SPA routing (only if React build exists)
+if (Directory.Exists(staticFilesPath))
+{
+    app.Use(async (context, next) =>
+    {
+        if (context.Request.Path.Value != null && 
+            !context.Request.Path.Value.StartsWith("/api") && 
+            !context.Request.Path.Value.StartsWith("/swagger") &&
+            !context.Request.Path.Value.StartsWith("/health") &&
+            !Path.HasExtension(context.Request.Path.Value))
+        {
+            context.Request.Path = "/index.html";
+        }
+        await next();
+    });
+}
 
 app.UseRouting();
 app.UseAuthorization();
