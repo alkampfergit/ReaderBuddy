@@ -107,27 +107,38 @@ else
 app.UseHttpsRedirection();
 app.UseCors();
 
-// Serve static files from the React build directory
-app.UseStaticFiles(new StaticFileOptions
+// Serve static files from the React build directory (only in non-testing environments)
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "..", "client", "build")),
-    RequestPath = ""
-});
-
-// Fallback to index.html for SPA routing
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path.Value != null && 
-        !context.Request.Path.Value.StartsWith("/api") && 
-        !context.Request.Path.Value.StartsWith("/swagger") &&
-        !context.Request.Path.Value.StartsWith("/health") &&
-        !Path.HasExtension(context.Request.Path.Value))
+    var clientBuildPath = Path.Combine(builder.Environment.ContentRootPath, "..", "client", "build");
+    if (Directory.Exists(clientBuildPath))
     {
-        context.Request.Path = "/index.html";
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(clientBuildPath),
+            RequestPath = ""
+        });
     }
-    await next();
-});
+    else
+    {
+        // Log warning about missing UI path but don't fail
+        app.Logger.LogWarning("UI path not found: {Path}. Static files may not be served correctly.", clientBuildPath);
+    }
+
+    // Fallback to index.html for SPA routing (only when serving static files)
+    app.Use(async (context, next) =>
+    {
+        if (context.Request.Path.Value != null && 
+            !context.Request.Path.Value.StartsWith("/api") && 
+            !context.Request.Path.Value.StartsWith("/swagger") &&
+            !context.Request.Path.Value.StartsWith("/health") &&
+            !Path.HasExtension(context.Request.Path.Value))
+        {
+            context.Request.Path = "/index.html";
+        }
+        await next();
+    });
+}
 
 app.UseRouting();
 app.UseAuthorization();
