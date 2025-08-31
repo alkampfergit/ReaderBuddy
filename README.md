@@ -1,6 +1,6 @@
 # ReaderBuddy
 
-A comprehensive reading tracking API built with ASP.NET Core and Entity Framework Core.
+A comprehensive reading tracking API with React UI built with ASP.NET Core and Entity Framework Core.
 
 ## Project Structure
 
@@ -10,10 +10,19 @@ ReaderBuddy/
 │   └── ReaderBuddy.WebApi/           # Main Web API project
 │       ├── Controllers/              # API controllers
 │       ├── Models/                   # Domain models
+│       │   └── DTOs/                 # Data Transfer Objects
 │       ├── Services/                 # Business logic layer
 │       ├── Data/                     # Data access layer
 │       ├── Configuration/            # Configuration classes
 │       └── Program.cs                # Application entry point
+├── client/                           # React frontend application
+│   ├── src/
+│   │   ├── components/               # React components
+│   │   ├── services/                 # API client services
+│   │   ├── types/                    # TypeScript type definitions
+│   │   └── App.tsx                   # Main App component
+│   ├── public/                       # Static assets
+│   └── package.json                  # NPM dependencies
 ├── tests/
 │   └── ReaderBuddy.WebApi.Tests/     # Test project
 │       ├── Controllers/              # Controller tests
@@ -28,6 +37,8 @@ ReaderBuddy/
 ## Features
 
 - **RESTful API Design**: Follows REST principles with proper HTTP verbs and status codes
+- **React Frontend UI**: Modern, responsive web interface for bookmark management
+- **Bookmark Management**: Save, organize, and search bookmarks with tags
 - **Layered Architecture**: Clear separation between controllers, services, and data access
 - **Entity Framework Core**: Code-first approach with migrations support
 - **Repository Pattern**: Abstracted data access with generic repository implementation
@@ -82,6 +93,36 @@ ReaderBuddy/
    - Swagger UI: https://localhost:7274 or http://localhost:5201
    - Health Check: https://localhost:7274/health
 
+### Running the React UI
+
+1. **Navigate to the client directory**
+   ```bash
+   cd client
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure API endpoint** (optional)
+   - The default configuration points to `http://localhost:5000/api` for development
+   - You can modify the `.env.development` file to change the API URL
+
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
+
+5. **Access the application**
+   - Web UI: http://localhost:3000
+   - The React app will automatically reload when you make changes
+
+6. **Build for production**
+   ```bash
+   npm run build
+   ```
+
 ### Running with Docker
 
 1. **Development environment**
@@ -114,6 +155,16 @@ dotnet test --collect:"XPlat Code Coverage"
 - `PUT /api/books/{id}` - Update existing book
 - `DELETE /api/books/{id}` - Delete book
 - `GET /api/books/search?searchTerm={term}` - Search books
+
+### Bookmarks
+
+- `GET /api/bookmarks` - Get all bookmarks
+- `GET /api/bookmarks/{id}` - Get bookmark by ID
+- `POST /api/bookmarks` - Create new bookmark with tags
+- `PUT /api/bookmarks/{id}` - Update existing bookmark
+- `DELETE /api/bookmarks/{id}` - Delete bookmark
+- `GET /api/bookmarks/search?searchTerm={term}` - Search bookmarks
+- `GET /api/bookmarks/tags` - Get all available tags
 
 ### Health Check
 

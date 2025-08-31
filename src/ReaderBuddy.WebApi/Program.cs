@@ -21,6 +21,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // Add business services
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 
 // Add API documentation
 builder.Services.AddEndpointsApiExplorer();
