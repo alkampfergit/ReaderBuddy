@@ -22,9 +22,9 @@ ReaderBuddy is a .NET application designed for reading assistance and management
 
 ## Working Effectively
 - Verify environment setup:
-  - `dotnet --version` -- should show .NET 8.0.119 or later
+  - `dotnet --version` -- should show .NET 9.0.100 or later
   - `git --version` -- should show Git 2.51.0 or later
-- Current repository state: Full-featured .NET 8 WebAPI with React client, CI/CD pipeline, and Docker support
+- Current repository state: Full-featured .NET 9 WebAPI with React client, CI/CD pipeline, and Docker support
 - Project initialization (when creating new projects):
   - `dotnet new list` -- view available .NET project templates
   - `dotnet new sln -n ReaderBuddy` -- create solution file
@@ -77,10 +77,10 @@ drwxr-xr-x 3 runner docker 4096 Aug 31 10:36 tests
 ### Environment verification
 ```
 dotnet --version
-8.0.119
+9.0.100
 
 dotnet --list-sdks
-8.0.119 [/usr/lib/dotnet/sdk]
+9.0.100 [/usr/lib/dotnet/sdk]
 
 git --version
 git version 2.51.0
@@ -116,7 +116,7 @@ When working with the CI/CD pipeline:
 - CI/CD pipeline runs on all branch pushes and pull requests
 - Docker images built automatically on master and hotfix branches
 - All builds must pass before merging to master or develop
-- Use .NET 8+ language features and patterns
+- Use .NET 9+ language features and patterns
 - Follow standard .NET project structure conventions
 - Use xUnit for unit testing (most common in .NET ecosystem)
 - Consider using ASP.NET Core for web applications given the "ReaderBuddy" name suggests a user-facing application

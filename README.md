@@ -52,7 +52,7 @@ ReaderBuddy/
 
 ## Technology Stack
 
-- **.NET 8**: Latest LTS framework
+- **.NET 9**: Latest LTS framework
 - **ASP.NET Core**: Web API framework
 - **Entity Framework Core**: Object-relational mapping
 - **SQL Server**: Database (configurable)
@@ -65,7 +65,7 @@ ReaderBuddy/
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 9 SDK
 - SQL Server (LocalDB for development)
 - Docker (optional)
 

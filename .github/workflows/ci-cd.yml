@@ -21,7 +21,7 @@ on:
         type: boolean
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '9.0.x'
   DOCKER_IMAGE_NAME: 'readerbuddy'
 
 jobs:
